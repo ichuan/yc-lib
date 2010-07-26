@@ -2,7 +2,8 @@
 // @name           Google Reader for wider screens and Better reading
 // @namespace      http://wtw.tw/scripts/
 // @description    Changes the maximum width of Google Reader items, for better viewing on wider screens with higher resolutions.
-// @include        *.google.*
+// @include        http://www.google.com/reader*
+// @include        https://www.google.com/reader*
 // ==/UserScript==
 
 function setRuleStyle(sClassName, sRule) {
