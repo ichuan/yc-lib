@@ -36,3 +36,5 @@ let Tlist_File_Fold_Auto_Close=1
 :map <F6> <Esc>i# -*- coding: utf-8 -*-<Esc>o
 "fu*k mouse
 set mouse=
+"paste mode toggle is F9
+set pt=<f9>
