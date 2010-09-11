@@ -5,7 +5,6 @@
  * @package Markdown
  * @author ichuan
  * @version 0.1
- * @dependence 9.9.2-*
  * @link http://hi.baidu.com/ichuan
  */
 
