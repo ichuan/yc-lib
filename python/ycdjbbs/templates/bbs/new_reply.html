@@ -1,0 +1,12 @@
+{% extends 'bbs/base.html' %}
+{% block title %}{{ block.super }} - New Reply{% endblock %}
+{% block body %}
+<h2>New Reply</h2>
+    <form action="" method="post">
+{% csrf_token %}
+    <table>
+        <tr><th><label for="id_content">Content:</label></th><td><textarea id="id_content" rows="10" cols="40" name="content"></textarea></td></tr>
+        <tr><th></th><td><input id="id_submit" type="submit" value="Submit" /></td></tr>
+    </table>
+    </form>
+{% endblock %}

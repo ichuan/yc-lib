@@ -1,0 +1,108 @@
+{% extends 'bbs/base.html' %}
+{% block title %}{{ block.super }} - Index{% endblock %}
+{% load myfilters %}
+{% block body %}
+<script>
+$(function(){
+    $('#anew').click(function(){
+        $('#new_post').slideDown('fast');
+        return false;
+    });
+    $('#new_form').submit(function(){
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: '/bbs/post/new?ajax=true',
+            data: $(this).serialize(),
+            success: function(data){
+                $('#loading,#new_post').hide();
+                $('#new_post > input, #new_post > textarea').val();
+                if (data.id)
+                    insertRow(data);
+            }
+        });
+        return false;
+    });
+});
+function insertRow(data)
+{
+    location.reload()
+}
+</script>
+<h2>Posts</h2>
+<h4>{% if user.is_anonymous %}<a href="/accounts/login?next=/bbs">Login</a> or <a href="/accounts/register">Register</a>{% else %}hello, {{ user.username }}. <a href="/bbs/post/new" id="anew">New Post</a> or <a href="/accounts/logout">Logout</a>{% endif %}</h4>
+<div id="new_post" style="display:none">
+<h3>New Post</h3>
+    <form action="/bbs/post/new" method="post" id="new_form">
+{% csrf_token %}
+    <table>
+        <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="255" /></td></tr>
+        <tr><th><label for="id_content">Content:</label></th><td><textarea id="id_content" rows="10" cols="40" name="content"></textarea></td></tr>
+        <tr><th><label for="id_tags">Tags:</label></th><td><input id="id_tags" type="text" size="40" name="tags" maxlength="255" /> <span style="color:gray;font-size:12px;">Separete tags with comma</span></td></tr>
+        <tr><th></th><td><input id="id_submit" type="submit" value="Submit" /></td></tr>
+    </table>
+    </form>
+</div>
+<div id="loading" style="display:none;">loading...</div>
+<div class="pagnation">
+<span>Posts per page: <select id="pagesize">
+    {% for i in '5,10,15,20,25'|split:',' %}
+    <option value="{{ i }}">{{ i }}</option>
+    {% endfor %}
+</select></span>
+<span>Filter by tag: <input type="text" name="tag" value="{{ tag|default_if_none:''|addslashes }}" size="10" /><input type="button" value="go" onclick="javascript:reloadBy('tag', $(this).prev().val())" /></span>
+</div>
+<div id="posts"></div>
+<div class="pagnation">
+<span><a href="#" onclick="javascript:reloadBy('page',1)">First</a>
+{% if page_obj.has_previous %}<a href="#" onclick="javascript:reloadBy('page',{{ page_obj.previous_page_number }})">Previous</a>{% endif %}
+{% for i in paginator.page_range %}
+<a href="#" onclick="javascript:reloadBy('page',{{ i }})">{{ i }}</a>
+{% endfor %}
+{% if page_obj.has_next %}<a href="#" onclick="javascript:reloadBy('page',{{ page_obj.next_page_number }})">Next</a>{% endif %}
+<a href="#" onclick="javascript:reloadBy('page',{{ paginator.num_pages }})">Last</a></span>
+</div>
+{% endblock %}
+{% block script %}
+var params = {
+    page: {{ page_obj.number }},
+    tag: '{{ tag|default_if_none:''|urlencode }}',
+    pagesize: {{ paginator.per_page }}
+};
+var gtable;
+$(function(){
+    $('#pagesize').change(function(){ reloadBy('pagesize', $(this).val()); }).val(params['pagesize']);
+});
+function reloadBy(k, v){
+    if (params[k])
+        params[k] = v;
+    var b = [];
+    $.each(params, function(k, v){ if(v) b.push(k+'='+encodeURIComponent(v)); });
+    location.search = '?' + b.join('&');
+}
+google.load('visualization', '1', {packages:['table']});
+google.setOnLoadCallback(function(){
+    var data = new google.visualization.DataTable();
+    var dataJson = {
+        cols: [
+            {id:'A',label:'Id',type:'number'},
+            {id:'B',label:'Subject',type:'string'},
+            {id:'E',label:'Tags',type:'string'},
+            {id:'C',label:'Author',type:'string'},
+            {id:'D',label:'Posted',type:'string'},
+            {id:'F',label:'Operation',type:'string'}
+        ],
+        rows: [
+            {% for p in object_list %}
+                {% if forloop.last %}
+            {c:[{v:{{ p.id }}},{v:'<a href="{{ p.get_absolute_url }}">{{ p.subject|addslashes|escape}}</a>'},{v:'{% for i in p.tags.all %}<a href="/bbs?tag={{ i.tag_name|urlencode }}">{{ i.tag_name|addslashes|escape }}</a>{% endfor %}'},{v:'{{ p.author|addslashes|escape }}'},{v:'{{ p.created|timesince }}'},{v:'{% if user.is_superuser %}<a href="/bbs/post/del/{{p.id}}">Delete</a>{% endif %}{% ifequal user.id p.author.id %} <a href="/bbs/post/edit/{{p.id}}">Edit</a>{% endifequal %}'}]}
+                {% else %}
+            {c:[{v:{{ p.id }}},{v:'<a href="{{ p.get_absolute_url }}">{{ p.subject|addslashes|escape}}</a>'},{v:'{% for i in p.tags.all %}<a href="/bbs?tag={{ i.tag_name|urlencode }}">{{ i.tag_name|addslashes|escape }}</a>{% endfor %}'},{v:'{{ p.author|addslashes|escape }}'},{v:'{{ p.created|timesince }}'},{v:'{% if user.is_superuser %}<a href="/bbs/post/del/{{p.id}}">Delete</a>{% endif %}{% ifequal user.id p.author.id %} <a href="/bbs/post/edit/{{p.id}}">Edit</a>{% endifequal %}'}]},
+                {% endif %}
+            {% endfor %}
+        ]
+    };
+    gtable = new google.visualization.Table(document.getElementById('posts'));
+    gtable.draw(new google.visualization.DataTable(dataJson), {allowHtml: true, width: '600px'});
+});
+{% endblock %}

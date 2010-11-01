@@ -1,0 +1,16 @@
+{% extends 'bbs/base.html' %}
+{% block title %}{{ block.super }} - View Post{% endblock %}
+{% block body %}
+<h4><a href="/bbs">Back</a></h4>
+<h2>{{ post.subject|escape }}</h2>
+<div class="post_meta">by {{ post.author|escape }} at {{ post.created|timesince }} ago{% if post.updated %}, last updated at {{ post.updated|timesince}} ago{% endif %}. <a href="/bbs/reply/{{ post.id }}">Reply</a></div>
+<div class="post_content">{{ post.content|linebreaksbr|escape }}</div>
+<hr />
+<h3>{{ replies|length }} replies</h3>
+<div id="replies">
+{% for post in replies %}
+<div class="post_meta">by {{ post.author|escape }} at {{ post.created|timesince }} ago{% if post.updated %}, last updated at {{ post.updated|timesince}} ago{% endif %}</div>
+<div class="post_content">{{ post.content|linebreaksbr|escape }}</div>
+{% endfor %}
+</div>
+{% endblock %}

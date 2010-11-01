@@ -1,0 +1,14 @@
+{% extends 'bbs/base.html' %}
+{% block title %}{{ block.super }} - Edit Post{% endblock %}
+{% block body %}
+<h2>Edit Post</h2>
+    <form action="" method="post">
+{% csrf_token %}
+    <table>
+        <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" value="{{ post.subject|escape }}" maxlength="255" /></td></tr>
+        <tr><th><label for="id_content">Content:</label></th><td><textarea id="id_content" rows="10" cols="40" name="content">{{ post.content|escape}}</textarea></td></tr>
+        <tr><th><label for="id_tags">Tags:</label></th><td><input id="id_tags" type="text" value="{{post.tags.all|join:','}}" size="40" name="tags" maxlength="255" /> <span style="color:gray;font-size:12px;">Separete tags with comma</span></td></tr>
+        <tr><th></th><td><input id="id_submit" type="submit" value="Submit" /></td></tr>
+    </table>
+    </form>
+{% endblock %}

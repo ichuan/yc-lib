@@ -1,0 +1,17 @@
+{% extends 'bbs/base.html' %}
+{% block body %}
+{% if errors %}
+<ul>
+{% for i in errors %}
+    <li><strong>{{ i }}</strong>{{ errors.i }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+<form action="" method="post">
+<table>
+{% csrf_token %}
+{{ form.as_table }}
+<tr><th></th><td><input id="id_submit" type="submit" value="Submit" maxlength="30" /></td></tr>
+</table>
+</form>
+{% endblock %}

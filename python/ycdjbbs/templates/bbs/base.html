@@ -1,0 +1,29 @@
+<!DOCTYPE html> 
+<html>
+<head>
+<meta name="Content-Type" content="text/html; charset=utf-8" />
+<script type='text/javascript' src='http://www.google.com/jsapi'></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type='text/javascript'>
+{% block script %}{% endblock %}
+</script>
+<title>{% block title %}ycdjbbs{% endblock %}</title>
+<style>
+body {font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", "Luxi Sans", Tahoma, sans-serif;}
+.odd {background-color:#ddd;}
+.alignright {text-align:right;}
+a {text-decoration: none;}
+a:link, a:visited { color:#AB5603; }
+a:hover { background-color:#E0FFB8; color:#234f32; text-decoration:none; }
+.post_meta {color:gray;font-size:80%;}
+.post_content {padding:10px;}
+#replies .post_content {margin-bottom: 20px;}
+.pagnation {border:1px solid #ccc;background-color:#eee;padding:5px;width:590px;margin:5px 0;}
+.pagnation span {margin-right:10px;font-size:12px;color:#333;}
+</style>
+<head>
+    <body>
+        {% block body %}
+        {% endblock %}
+    </body>
+</html>
