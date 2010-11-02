@@ -14,7 +14,7 @@ import time, random, threading, bsddb, sys, os, re
 
 #url_pattern  = re.compile(r'^(https?)://([a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)+)(/?.*)$')
 url_pattern  = re.compile(ur'^https?://[^.]+(\.[^.]+)+.*$', re.IGNORECASE)
-link_pattern = re.compile(ur'<a\s+href="([^"]+)', re.IGNORECASE)
+link_pattern = re.compile(ur'''<[^>]+(?:href|src)=["']?([^'"]+)''', re.IGNORECASE)
 trim_hash    = re.compile(ur'#.*')
 trim_script  = re.compile(ur'<script[^>]*>.*?</script>', re.DOTALL | re.IGNORECASE)
 meta_charset = re.compile(ur'''<meta[^>]+charset=["']?([a-zA-Z0-9\-]+)''')
@@ -83,7 +83,11 @@ class yccrawler:
         self.__close_bdb()
 
         time.sleep(self.status_inteval)
-        print 'all done, %d urls crawled, %d urls containing %s' % (self.count_crawled, self.count_hit, self.options.keyword)
+        print 'all done, %d urls crawled' % self.count_crawled,
+        if self.options.keyword:
+            print ', %d urls containing %s' % (self.count_hit, self.options.keyword)
+        else:
+            print ''
 
     def crawl_thread(self):
         '''
@@ -244,5 +248,6 @@ if __name__ == '__main__':
     if options.dbfile is None or os.path.isfile(options.dbfile):
         parser.error('use -f option to specify a new file for data storing')
 
-    options.keyword = options.keyword.decode('utf-8') # convert utf-8 to unicode
+    if options.keyword:
+        options.keyword = options.keyword.decode('utf-8') # convert utf-8 to unicode
     c.dispatch()
