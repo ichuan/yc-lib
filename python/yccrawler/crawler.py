@@ -20,6 +20,8 @@ trim_script  = re.compile(ur'<script[^>]*>.*?</script>', re.DOTALL | re.IGNORECA
 meta_charset = re.compile(ur'''<meta[^>]+charset=["']?([a-zA-Z0-9\-]+)''')
 header_charset = re.compile(ur'charset=(.+)$')
 
+DEBUG = False
+
 class yccrawler:
     '''
     a simple multi-thread crawler filtering webpages by keyword.
@@ -34,9 +36,16 @@ class yccrawler:
         self.current_url   = options.starturl
         self.lock          = threading.RLock()
         self.all_done      = False
+        self.binary_ext    = ['zip', 'png', 'jpeg', 'rar', 'bmp', 'jpg', '7z', 'doc', 'xls', 'pdf', 'ppt', 'dat', 'cab', 'swf', 'exe', 'chm', 'gif', 'iso', 'mp3', 'msi', 'wav', 'rmvb', 'wmv', 'rm']
         self.status_inteval= 1
+        self.urls          = set() # urls pending to be crawled
+        self.urls.add(options.starturl.decode('utf-8'))
         if options.starturl:
             self.url_queue.put((trim_hash.sub('', options.starturl), 1)) # item in queue is tuple: (url, depth)
+        # set timeout in urllib
+        if options.timeout and options.timeout > 0:
+            import socket
+            socket.setdefaulttimeout(options.timeout)
 
     def list_urls(self):
         '''
@@ -101,7 +110,7 @@ class yccrawler:
                 time.sleep(1)
                 continue
 
-            if self.dbh.has_key(url):
+            if self.is_binary(url):
                 self.url_queue.task_done()
                 continue
 
@@ -116,9 +125,9 @@ class yccrawler:
                 continue
 
             # ignore non-text urls
-            if info.getmaintype() != 'text':
-                self.url_queue.task_done()
-                continue
+            #if info.getmaintype() != 'text':
+            #    self.url_queue.task_done()
+            #    continue
 
             # convert charset to `utf-8` if needed
             charset = self.get_charset(info.getheader('Content-Type'), html)
@@ -132,10 +141,14 @@ class yccrawler:
             # save new urls to queue
             if depth < self.options.depth:
                 depth += 1
-                for link in link_pattern.findall(self.clean_html(html)):
+                for link in link_pattern.findall(html):
                     link = self.valid_link(link, url)
                     if link:
-                        self.url_queue.put_nowait((link.encode('utf-8'), depth)) # bdb does not support unicode key
+                        self.lock.acquire()
+                        if not link in self.urls:
+                            self.urls.add(link)
+                            self.url_queue.put_nowait((link.encode('utf-8'), depth)) # bdb does not support unicode key
+                        self.lock.release()
 
             self.lock.acquire()
             if self.options.keyword is None or html.find(self.options.keyword) != -1:
@@ -148,6 +161,17 @@ class yccrawler:
             self.lock.release()
 
             self.url_queue.task_done()
+
+    def is_binary(self, url):
+        '''
+        '''
+        parsed = urlparse(url)
+        root, ext = os.path.splitext(parsed.path)
+        if ext == '':
+            return False
+        if ext[1:].lower() in self.binary_ext:
+            return True
+        return False
 
     def get_charset(self, header, html, default='gbk'):
         '''
@@ -206,9 +230,20 @@ class yccrawler:
         '''
         if parsed_current_url is None:
             parsed_current_url = urlparse(current_url)
-        root_domain = parsed_current_url.netloc[3:] if parsed_current_url.netloc.split('.')[0] == 'www' else '.' + parsed_current_url.netloc
-        domain = urlparse(url).netloc
-        return domain.find(root_domain) == len(domain) - len(root_domain)
+        #root_domain = parsed_current_url.netloc[3:] if parsed_current_url.netloc.split('.')[0] == 'www' else '.' + parsed_current_url.netloc
+        root_domain, domain = parsed_current_url.netloc[::-1], urlparse(url).netloc[::-1]
+        len1, len2 = len(root_domain), len(domain)
+
+        if root_domain == domain:
+            return True
+        if len1 >= len2:
+            return False
+
+        # determine if domain is a subdomian of root_domain
+        index = domain.find(root_domain)
+        if index == 0 and domain[len(root_domain)] == '.':
+            return True
+        return False
 
     def status_thread(self):
         '''
@@ -217,7 +252,7 @@ class yccrawler:
         while not self.all_done:
             time.sleep(self.status_inteval)
             total = self.url_queue.qsize() + self.count_crawled
-            percent = (self.count_crawled / float(total) * 100) if total != 0 else 100.0 
+            percent = (self.count_crawled / float(total) * 100) if total != 0 else 0.0 
             print 'Progress: %.2f%%, %d/%d/%d(hit/crawled/total), current url: %s' % (percent, self.count_hit, self.count_crawled, total, self.current_url)
 
 if __name__ == '__main__':
@@ -228,6 +263,7 @@ if __name__ == '__main__':
     parser.add_option('-t', '--threads', dest='threads', help='how many threads should be used. (default: 5)', default=5, type='int')
     parser.add_option('-f', '--dbfile', dest='dbfile', help='the file where data should be saved')
     parser.add_option('-k', '--key', dest='keyword', help='the keyword to search')
+    parser.add_option('-m', '--timeout', dest='timeout', help='timeout for a single url in seconds. (default: 5)', default=5, type='int')
     parser.add_option('-l', '--list', dest='list', help='list the urls in a bsddb file specified by -f', action='store_true')
 
     options, args = parser.parse_args()
