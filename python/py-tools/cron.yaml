@@ -2,3 +2,6 @@ cron:
 - description: daily checkin for xiami.com
   url: /task/xiami_checkin
   schedule: every 1 hours
+- description: weekly login for xiami.com
+  url: /task/xiami_login
+  schedule: every monday 09:00
