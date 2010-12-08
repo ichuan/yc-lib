@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!-- yc@2010-12-09 -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript">
+            var is_exploded = false,
+                action = chrome.browserAction.onClicked,
+                max_width = screen.width,
+                max_height = screen.height,
+                ratio = screen.width / screen.height,
+                area = screen.width * screen.height,
+                ceil = Math.ceil,
+                floor = Math.floor,
+                sqrt = Math.sqrt;
+            
+            function get_all_tabs(callback){
+                // fuck this!
+                // see http://stackoverflow.com/questions/4157271/chrome-windows-getall-is-undefined
+                var tabs = [];
+                chrome.windows.getAll({populate: true}, function(wnds) {
+                    for (var i = 0; i < wnds.length; i++)
+                        tabs = tabs.concat(wnds[i].tabs)
+                    if (tabs.length <= 1)
+                        return;
+                    callback && callback(tabs);
+                });
+            }
+
+            function create_window(options, callback, tab_id){
+                chrome.windows.create(options, function(w){ callback && callback(w, tab_id); });
+            }
+
+            function move_tab(tab_id, win_id, callback){
+                chrome.tabs.move(tab_id, {windowId:win_id, index: 0}, function(){
+                    callback && callback(win_id);
+                });
+            }
+
+            function do_explode(){
+                if (is_exploded)
+                    return;
+
+                get_all_tabs(function(tabs){
+                    // compute width and height of each tab
+                    var tab_height = floor(sqrt(area / tabs.length / ratio));
+                    var tab_width = floor(tab_height * ratio);
+                    var columns = max_width / tab_width;
+                    if (max_width % tab_width !== 0){
+                        columns = ceil(max_width / tab_width);
+                        tab_width = floor(max_width / columns);
+                        tab_height = floor(tab_width / ratio);
+                    }
+
+                    for (var i = 0; i < tabs.length; i++){
+                        create_window({
+                            url: 'about:blank',
+                            left: ceil(i % columns * tab_width),
+                            top: ceil(floor(i / columns) * tab_height),
+                            width: tab_width,
+                            height: tab_height,
+                            type: 'normal'
+                        }, function(w, tab_id){
+                            move_tab(tab_id, w.id, function(win_id){
+                                // delete blank page
+                                chrome.tabs.getAllInWindow(win_id, function(t){
+                                    if (t.length === 2)
+                                        chrome.tabs.remove(t[1].id, function(){});
+                                });
+                            });
+                        }, tabs[i].id);
+                    }
+
+                    is_exploded = true;
+                    chrome.browserAction.setTitle({title:'Restore all tabs into one window'})
+                    action.removeListener(do_explode);
+                    action.addListener(do_restore);
+                });
+            }
+
+            function do_restore(){
+                if (!is_exploded)
+                    return;
+
+                get_all_tabs(function(tabs){
+                    var wnd_id = tabs[0].windowId;
+                    tabs.shift();
+                    for (var i = 0; i < tabs.length; i++){
+                        chrome.tabs.move(tabs[i].id, {windowId: wnd_id, index: 0}, function(){});
+                    }
+                    chrome.windows.update(wnd_id, {
+                        left: 0, 
+                        top: 0, 
+                        width: max_width,
+                        height: max_height, 
+                        focused: true
+                    }, function(){});
+
+                    is_exploded = false;
+                    chrome.browserAction.setTitle({title: 'Explode all tabs!'})
+                    action.removeListener(do_restore);
+                    action.addListener(do_explode);
+                });
+            }
+
+            action.addListener(do_explode);
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
