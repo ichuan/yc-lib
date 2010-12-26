@@ -70,7 +70,7 @@ class TaskHandler(webapp.RequestHandler):
         })
         auth = 'email=%s&password=%s&type=1&submit=1&autologin=1' % (EMAIL, PASSWORD)
         obj = fetch('http://www.xiami.com/member/login', method='POST', headers=self.headers, follow_redirects=False, payload=auth)
-        ret = re.search(r'^(auth=[^;]+)', obj.headers['set-cookie']).group()
+        ret = re.search(r'(user_auth=[^;]+)', obj.headers['set-cookie']).group()
         memcache.set('cookie', ret)
         return ret
 
