@@ -1,0 +1,4 @@
+== sudo without passwd ==
+1. sudo visudo
+2. append this line at the end: "yc ALL=(ALL) NOPASSWD: ALL"
+3. C+o and C+x
