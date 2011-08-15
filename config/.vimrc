@@ -1,4 +1,3 @@
-sy enable
 sy on
 "显示行号
 set nu
@@ -14,7 +13,7 @@ set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 "扩展TAB为4个空格
-set expandtab
+set noexpandtab
 "高亮搜索结果
 set hlsearch
 "编码
@@ -22,7 +21,7 @@ set encoding=utf-8
 set fileencoding=utf-8
 "不自动备份
 set nobackup
-"color evening
+color evening
 let g:miniBufExplMapWindowNavVim = 1
 let g:miniBufExplMapWindowNavArrows = 1
 let g:miniBufExplMapCTabSwitchBufs = 1
@@ -38,3 +37,15 @@ let Tlist_File_Fold_Auto_Close=1
 set mouse=
 "paste mode toggle is F9
 set pt=<f9>
+
+"
+function HeaderPython()
+	call setline(1, "#!/usr/bin/env python")
+	call append(1, "# coding: utf-8")
+	call append(2, "# yc@" . strftime('%Y/%m/%d', localtime()))
+	normal G
+	normal o
+	normal o
+endf
+
+autocmd bufnewfile *.py call HeaderPython()

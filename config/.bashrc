@@ -53,9 +53,9 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@local\[\033[00m\]: \[\033[01;34m\]\w\[\033[00m\]\$ '
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@ubt\[\033[00m\]: \[\033[01;34m\]\w\[\033[00m\]\$ '
 else
-    PS1='${debian_chroot:+($debian_chroot)}\u@local:\w\$ '
+    PS1='${debian_chroot:+($debian_chroot)}\u@ubt:\w\$ '
 fi
 unset color_prompt force_color_prompt
 
@@ -87,14 +87,7 @@ if [ -x /usr/bin/dircolors ]; then
     #alias vdir='vdir --color=auto'
 
     alias grep='grep --color=auto'
-	alias g='/home/yc/bin/grep.sh'
-#alias code='/home/yanchuan/bin/code'
-#	alias addr='/home/yanchuan/bin/addr'
-    #TransLate
-    alias tl='php /home/yc/bin/tl.php'
-    alias gt='/home/yc/bin/gt.py'
-    alias cs='( cd /home/yc/soft/CS1.5/; wine /home/yc/soft/CS1.5/cstrike.exe -opengl )'
-    alias word='/opt/openoffice.org3/program/swriter'
+	alias Grep=grep
     #alias fgrep='fgrep --color=auto'
     #alias egrep='egrep --color=auto'
 fi
@@ -126,42 +119,4 @@ short (){
 }
 # object-c env
 #. /usr/share/GNUstep/Makefiles/GNUstep.sh
-alias cn='zhcon --utf8'
-
-# download dir
-username=yc
-mk_download_dir (){
-    d="/home/${username}/tmp/download/"`date '+%Y_%m_%d'`
-    f="/home/${username}/download"
-    [ -d "$d" ] && return
-    mkdir -p "$d"
-    [ -L "$f" ] && unlink "$f"
-    ln -s "$d" "$f"
-}
-
-# sync photos from phone to dropbox
-SRC=/media/[^c]*/DCIM/100MEDIA/
-DST=/home/yc/Dropbox/Photos/
-sync_photo (){
-    [ -d $SRC -a -d $DST ] && rsync -av $SRC $DST || return
-}
-
-# del current wallpaper
-dwp () {
-    x=$(ls -l /home/yc/wallpaper/current |cut -d'>' -f2)
-    rm $x
-    cwp
-}
-
-# java
-export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
- 
-# from http://imtx.cn/archives/1516.html
-# usage: notify make
-notify () {
-    $* && \
-    notify-send "Cool~ \"$*\" finished!" -i 'emblem-cool' || \
-    notify-send "Oh No! \"$*\" failed!" -i 'emblem-ohno'
-}
-
-mk_download_dir
+#alias cn='zhcon --utf8'
