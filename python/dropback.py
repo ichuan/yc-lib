@@ -4,6 +4,7 @@
 
 '''
 Backup files to your dropbox account
+i.e. python dropback.py -k abc -s def -u i@u.com -p mypasswd -f /tmp/a.zip -t /backup/
 '''
 import sys
 from optparse import OptionParser
@@ -39,7 +40,7 @@ class DropBack(object):
 
 	def main(self):
 		'''解析命令行参数，执行备份'''
-		parser = OptionParser()
+		parser = OptionParser(usage='e.g. %prog -k abc -s def -u i@u.com -p mypasswd -f /tmp/a.zip -t /backup/')
 		parser.add_option('-k', '--key', help='Dropbox App key', dest='consumer_key')
 		parser.add_option('-s', '--secret', help='Dropbox App secret', dest='consumer_secret')
 		parser.add_option('-f', '--file', help='File to backup', dest='local')
