@@ -8,6 +8,7 @@ def combination(arr, m, callback):
 	'''
 	从 arr 数组中取 m 个元素组成一个新数组，调用 callback 处理
 	也就是数学中的“组合” http://911.im/5
+	全排列可以用itertools里的product：http://911.im/i
 	'''
 	n = len(arr)
 

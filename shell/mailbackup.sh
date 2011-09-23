@@ -2,7 +2,7 @@
 # send report and backup file to your email
 
 # report cmds
-CMDS=( "ps auxk -rss" "free -m" "cat /proc/net/dev" )
+CMDS=( "ps auxk -rss" "free -m" "cat /proc/net/dev" "df -h" "uptime" )
 
 # zip password
 ZIP_PASS=55a8a0fae7b14756b3faf78b5f79c523d0aa95fe
