@@ -1,6 +1,7 @@
 /**
  * jQuery sparkline chart plugin
- * draw sparkline using Canvas, need excanvas support in IE7-
+ * draw sparkline using canvas, need excanvas support in IE9-
+ * demo: http://ichuan.net/static/sparkline.html
  *
  * @author yc <iyanchuan@gmail.com>
  */
@@ -32,15 +33,19 @@
 			} else
 				offsetY = ~~(min - (height - vGap) / 2);
 
-			var new_el = $('<canvas width="' + width + '" height="' + height + '" />')[0];
+			var new_el = document.createElement('canvas');
+			new_el.setAttribute('width', width);
+			new_el.setAttribute('height', height);
+			window.G_vmlCanvasManager && G_vmlCanvasManager.initElement(new_el);
 			if (!new_el.getContext)
 				return;
 			el.replaceWith(new_el);
+
 			var ctx = new_el.getContext('2d');
 			ctx.lineWidth = parseFloat(opts.lineWidth);
 			ctx.lineJoin = 'round';
 			ctx.beginPath();
-			var first = true, points = [];
+			var first = true;
 			for (var i = 0, j = opts.numbers.length; i < j; i++){
 				var x = ~~(hGap * i), y = height - ~~(opts.numbers[i] * multiply - offsetY);
 				if (first){
@@ -48,15 +53,7 @@
 					first = false;
 				} else
 					ctx.lineTo(x, y);
-				points.push([x, y]);
 			}
-			points.reverse();
-			// draw back
-			for (var i = 0, j = points.length; i < j; i++){
-				var k = points[i];
-				ctx.lineTo(k[0], k[1]);
-			}
-			ctx.closePath();
 			ctx.strokeStyle = opts.color;
 			ctx.stroke();
 		});
