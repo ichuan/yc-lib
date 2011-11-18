@@ -14,7 +14,7 @@
 		}, options);
 
 		return this.each(function(){
-			var el = $(this), opts = $.extend({}, options);
+			var el = $(this), opts = $.extend({}, options), cls = el[0].className;
 			var height = el.height(), width = el.width();
 			$.each(['color', 'numbers', 'lineWidth'], function(_, item){
 				var value = el.data(item);
@@ -36,6 +36,8 @@
 			var new_el = document.createElement('canvas');
 			new_el.setAttribute('width', width);
 			new_el.setAttribute('height', height);
+			if (cls)
+				new_el.setAttribute('class', cls);
 			window.G_vmlCanvasManager && G_vmlCanvasManager.initElement(new_el);
 			if (!new_el.getContext)
 				return;
