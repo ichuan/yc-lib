@@ -37,9 +37,11 @@
 	display:block;
 }
 
+.nav .dropdown-menu .dropdown > .dropdown-toggle,
 .nav .menu-dropdown .dropdown > .dropdown-toggle {
 	color:#999;
 }
+.nav .dropdown-menu .dropdown > .dropdown-toggle:hover,
 .nav .menu-dropdown .dropdown > .dropdown-toggle:hover {
 	color:#fff;
 }
