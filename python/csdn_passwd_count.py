@@ -4,27 +4,6 @@
 
 # 统计 csdn 密码库中 "安全密码" 的个数
 
-from __future__ import with_statement
-import re, string
-
-def lines(path):
-	'''
-	每行形如：'siclj # lj7202 # junlu@peoplemail.com.cn'
-	'''
-	with open(path)	as f:
-		for i in f:
-			yield i
-
-def passwd(lines):
-	'''
-	从一行字串中取出密码字串
-	'''
-	for i in lines:
-		try:
-			yield re.search(r'#\s*([^\s]+)', i).group(1)
-		except:
-			pass
-
 def strong_passwd(passwds):
 	'''
 	安全密码：(http://911.im/S)
@@ -32,12 +11,12 @@ def strong_passwd(passwds):
 		2. 英文字母 + 数字 + 特殊字符
 	'''
 	for i in passwds:
-		if (6 <= len(i) <= 16):
+		if 6 <= len(i) <= 16:
 			flag = 0
 			for j in i:
-				if j in string.ascii_letters:
+				if '0' <= j <= '9':
 					flag |= 4
-				elif j in string.digits:
+				elif 'A' <= j <= 'Z' or 'a' <= j <= 'z':
 					flag |= 2
 				elif j in '!@#$%^&*':
 					flag |= 1
@@ -45,4 +24,6 @@ def strong_passwd(passwds):
 					yield i
 					break
 
-print sum(1 for i in strong_passwd(passwd(lines('www.csdn.net.sql'))))
+logs = open('www.csdn.net.sql')
+passwds = (i[i.find('#')+1 : i.rfind('#')].strip() for i in logs)
+print sum(1 for i in strong_passwd(passwds))
