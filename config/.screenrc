@@ -1,0 +1,18 @@
+chdir
+
+bindkey "\033[D" prev # change window with ctrl-left
+bindkey "\033[C" next # change window with ctrl-right
+
+hardstatus on
+hardstatus alwayslastline
+hardstatus string "%{= br}%{g}[%{G}$USER@%H%{g}]%{w}%1`%{g}[%=%{=kw}%{w}%-w%{Y}[%{W}%n-%t%{Y}]%{w}%+w%=%{g}][%l][%{w}%Y-%m-%d %{Y}%c%{g}]"
+
+term xterm
+
+screen -t root      0 sudo su -
+screen -t dev       1
+screen -t dev       2
+screen -t dev       3
+select 1
+
+altscreen on
