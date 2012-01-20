@@ -50,9 +50,6 @@ endf
 " 新py文件自动追加头部
 autocmd bufnewfile *.py call HeaderPython()
 
-"自动 cd 到该文件所在目录
-autocmd BufEnter * execute "chdir ".escape(expand("%:p:h"), ' ')
-
 "去掉文件尾部的空白
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 
@@ -113,10 +110,8 @@ set wildmode=list:longest,full
 "
 set backspace=2
 
-"忽略大小写
-set ignorecase
-set smartcase
+" 缩进线
+set list
+set listchars=tab:\|\ 
 
-"搜索居中
-map N Nzz
-map n nzz
+"
