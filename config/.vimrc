@@ -50,35 +50,6 @@ endf
 " 新py文件自动追加头部
 autocmd bufnewfile *.py call HeaderPython()
 
-"去掉文件尾部的空白
-autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
-
-"恢复鼠标上次所在的位置
-augroup JumpCursorOnEdit
-   au!
-   autocmd BufReadPost *
-            \ if expand("<afile>:p:h") !=? $TEMP |
-            \   if line("'\"") > 1 && line("'\"") <= line("$") |
-            \     let JumpCursorOnEdit_foo = line("'\"") |
-            \     let b:doopenfold = 1 |
-            \     if (foldlevel(JumpCursorOnEdit_foo) > foldlevel(JumpCursorOnEdit_foo - 1)) |
-            \        let JumpCursorOnEdit_foo = JumpCursorOnEdit_foo - 1 |
-            \        let b:doopenfold = 2 |
-            \     endif |
-            \     exe JumpCursorOnEdit_foo |
-            \   endif |
-            \ endif
-   " Need to postpone using "zv" until after reading the modelines.
-   autocmd BufWinEnter *
-            \ if exists("b:doopenfold") |
-            \   exe "normal zv" |
-            \   if(b:doopenfold > 1) |
-            \       exe  "+".1 |
-            \   endif |
-            \   unlet b:doopenfold |
-            \ endif
-augroup END
-
 " 不兼容
 set nocompatible
 
@@ -109,9 +80,3 @@ set wildmode=list:longest,full
 
 "
 set backspace=2
-
-" 缩进线
-set list
-set listchars=tab:\|\ 
-
-"
