@@ -18,3 +18,7 @@ screen -t dev       3
 select 1
 
 altscreen on
+
+startup_message off # Turn off the splash screen
+defscrollback 100000 # scrollback buffer
+vbell off # shut the visual bell off
