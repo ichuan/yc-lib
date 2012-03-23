@@ -16,6 +16,7 @@ set hlsearch
 "编码
 set encoding=utf-8
 set fileencoding=utf-8
+set fileencodings=utf-8
 "不自动备份
 set nobackup
 "主题
@@ -68,15 +69,3 @@ set grepprg=grep\ -nH\ $*
 "自动缩进
 set autoindent
 
-"无拼写检查
-if version >= 700
-   set spl=en spell
-   set nospell
-endif
-
-"
-set wildmenu
-set wildmode=list:longest,full
-
-"
-set backspace=2
