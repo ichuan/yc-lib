@@ -1,9 +1,8 @@
 chdir
 
-bindkey -k k2 screen # F2: new tab
-bindkey -k k3 prev # F3: prev tab
-bindkey -k k4 next # F4: next tab
-bindkey -k k7 copy # F7: copy mode
+bindkey "\033[D" prev # change window with ctrl-left
+bindkey "\033[C" next # change window with ctrl-right
+bindkey -k k7 copy    # F7: copy mode
 
 hardstatus on
 hardstatus alwayslastline
