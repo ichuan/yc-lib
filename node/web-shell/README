@@ -1,0 +1,13 @@
+Intro
+=========
+
+web-shell: web-based shell. see http://ichuan.net/ for more details.
+
+
+Usage
+======
+
+    npm install
+    node app.js
+
+Then open http://localhost:8080/ to see it.
