@@ -12,7 +12,7 @@ def randfloat(a, b, precision=None):
   '''
   if precision is None:
     precision = 0
-    a1, b1 = str(a).lstrip('0123456789'), str(b).lstrip('0123456789')
+    a1, b1 = str(a).lstrip('-0123456789'), str(b).lstrip('-0123456789')
     if a1.startswith('.'):
       precision = len(a1) - 1
     if b1.startswith('.'):
@@ -28,3 +28,5 @@ if __name__ == '__main__':
   print randfloat(1, 2, precision=4)
   # 1.234000 to 2.3456789
   print randfloat(1.234, 2.3456789)
+  # -1.20 to 2.34
+  print randfloat(-1.2, 2.34)
