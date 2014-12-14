@@ -3,6 +3,8 @@
 # use case:
 #   to backup dir /path/to/dir/ rotatedly to /path/to/dir.{1..5}/ with rsync,
 #   run as: ./rsync-dir-rotate.sh /path/to/dir/ 5
+#
+#   see http://ichuan.net/post/62/simple-secure-rsync-rotate-backup/ for detail
 
 path=${1%/}
 num_rotates=${2:-5}
