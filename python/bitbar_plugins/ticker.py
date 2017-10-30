@@ -10,19 +10,25 @@ import urllib2
 import httplib
 from urlparse import urlparse
 from socket import error as SocketError
+from decimal import Decimal
 
 
 HTTP_TIMEOUT = 10
 TEMP_DIR = '/tmp/bitbar-ticker/'
 TICKERS = {
     'lsk': {
-        'url': 'https://bitbays.com/api/v1/ticker/?market=lsk_cny',
-        'pop': lambda i: json.loads(i)['result']['last'],
+        'url': 'https://api.coinmarketcap.com/v1/ticker/lisk/?convert=CNY',
+        'pop': lambda i: json.loads(i)[0]['price_cny'],
         'sym': u'¥',
     },
     'btc': {
-        'url': 'https://www.okcoin.cn/api/v1/ticker.do?symbol=btc_cny',
-        'pop': lambda i: json.loads(i)['ticker']['last'],
+        'url': 'https://api.coinmarketcap.com/v1/ticker/bitcoin/?convert=CNY',
+        'pop': lambda i: json.loads(i)[0]['price_cny'],
+        'sym': u'¥',
+    },
+    'ltc': {
+        'url': 'https://api.coinmarketcap.com/v1/ticker/litecoin/?convert=CNY',
+        'pop': lambda i: json.loads(i)[0]['price_cny'],
         'sym': u'¥',
     },
 }
@@ -40,25 +46,31 @@ def http_get(url, try_times=1):
             time.sleep(random.random())
 
 
+def normalize(val, precision=4):
+    fmt = '%%.%df' % precision
+    return Decimal(fmt % float(val)).normalize()
+
+
 def fetch(item, data_file=None):
     conf = TICKERS[item]
     prev = 0
     if data_file and os.path.isfile(data_file):
         try:
-            prev = open(data_file).read()
+            prev = float(open(data_file).read())
         except:
             pass
     try:
-        val = conf['pop'](http_get(conf['url']))
+        val = float(conf['pop'](http_get(conf['url'])))
         if val == prev:
             color = 'black'
-        elif float(val) > float(prev):
+        elif val > prev:
             color = 'red'
         else:
             color = 'green'
         if data_file:
-            open(data_file, 'w+').write(val)
+            open(data_file, 'w+').write(str(val))
         sym = conf['sym']
+        val = normalize(val)
     except:
         val = 'ERR'
         color = 'red'
@@ -68,12 +80,15 @@ def fetch(item, data_file=None):
     print out.encode('utf-8')
     print '---'
     domain = urlparse(conf['url']).netloc
-    print 'From: %s | href=http://%s' % (domain, domain)
+    print '%s | href=http://%s' % (domain, domain)
 
 
 def main():
     if not os.path.isdir(TEMP_DIR):
-        os.makedirs(TEMP_DIR)
+        try:
+            os.makedirs(TEMP_DIR)
+        except:
+            pass
     filename = os.path.basename(__file__)
     data_file = '%s%s.dat' % (TEMP_DIR, filename)
     try:
